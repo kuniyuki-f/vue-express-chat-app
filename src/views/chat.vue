@@ -1,43 +1,34 @@
 <template>
-  <div>
+  <v-app>
     <h2>チャットルーム</h2>
-    <ul>
-      <li v-for="(msg, index) in messages" :key="index">{{ msg.message }}</li>
-    </ul>
-    <div>
-      <v-text-field
-        type="text"
-        @keyup.enter="sendMessage(message)"
-        v-model="message"
-      />
-      <v-btn primary @click="sendMessage(message)">send</v-btn>
-    </div>
-  </div>
+    <chatForm :socket="socket" />
+    <chatMessages :socket="socket" />
+    <chatLogs :socket="socket" />
+  </v-app>
 </template>
 
 <script>
 import io from "socket.io-client";
+import chatForm from "@/components/chatForm";
+import chatLogs from "@/components/chatLogs";
+import chatMessages from "@/components/chatMessages";
+
 export default {
   name: "room",
   data() {
     return {
       messages: [],
-      // connect to server
+      logs: [],
       socket: io("localhost:3000"),
-      message: "",
     };
   },
-  methods: {
-    sendMessage(message) {
-      // send message to server
-      this.socket.emit("c2s_message", { message });
-    },
-  },
-  mounted() {
-    // receive message from server
-    this.socket.on("s2c_message", (data) => {
-      this.messages = [...this.messages, data];
-    });
-  },
+  components: { chatForm, chatLogs, chatMessages },
 };
 </script>
+
+<style lang="scss" scoped>
+li {
+  display: grid;
+  grid-template-columns: 20rem 10rem;
+}
+</style>

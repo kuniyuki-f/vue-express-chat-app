@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
-const xssFilters = require('xss-filters');
+
+const socket_manager = require('./public/js/socket_manager.js');
 
 // setting cors policy 
 const cors = require('cors');
@@ -10,25 +11,11 @@ app.use(cors({
     optionsSuccessStatus: 200
 }));
 
-
-
+// run server
 const server = app.listen(3000, () => {
     console.log('server running on port 3000');
 });
 
-const io = require('socket.io')(server, {
-    cors: {
-        origin: "http://localhost:8080",
-        methods: ["GET", "POST"],
-    }
-});
-
-io.on('connection', (socket) => {
-    console.log("ユーザが接続しました");
-
-    socket.on('c2s_message', function (data) {
-        data.message = xssFilters.inHTMLData(data.message);
-        io.emit('s2c_message', data);
-    });
-});
+// socket.io
+socket_manager.socket_manager(server);
 
