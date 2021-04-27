@@ -23,6 +23,7 @@ export default {
       // send message to server
       if (message !== "") {
         this.socket.emit("c2s_message", { message });
+        this.message = "";
       }
     },
   },
