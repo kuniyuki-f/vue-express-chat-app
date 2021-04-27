@@ -5,7 +5,10 @@
     </v-app-bar>
     <v-main>
       <router-view />
-      <div id="nav"><router-link to="/">Home</router-link> |</div>
+      <div id="nav">
+        <router-link to="/">Home</router-link> |
+        <router-link to="/login">login</router-link> |
+      </div>
     </v-main>
   </v-app>
 </template>
