@@ -1,7 +1,14 @@
+// setting express
 const express = require('express');
+const session = require('express-session');
 const app = express();
-
-const socket_manager = require('./public/js/socket_manager.js');
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+app.use(session({
+    secret: 'keyboard cat',
+    resave: true,
+    saveUninitialized: false,
+}));
 
 // setting cors policy 
 const cors = require('cors');
@@ -11,11 +18,14 @@ app.use(cors({
     optionsSuccessStatus: 200
 }));
 
+// setting routes
+app.use('/', require('./routes'));
+
 // run server
 const server = app.listen(3000, () => {
     console.log('server running on port 3000');
 });
 
 // socket.io
+const socket_manager = require('./public/js/socket_manager.js');
 socket_manager.socket_manager(server);
-
