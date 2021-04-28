@@ -11,33 +11,34 @@ exports.socket_manager = function (server) {
         }
     });
 
-    io.on('connection', (socket) => {
+    io.on('connection', async socket => {
         console.log("ユーザが接続しました");
 
         const sql = `SELECT * FROM message;`;
-        sqlManager.sql(sql, (result) => {
-            io.emit('s2c_log', result);
-        })
+        const result = await sqlManager.sql(sql);
+        if (result) {
+            io.emit('s2c_log', result['rows']);
+        }
 
-        socket.on('c2s_message', function (data) {
+
+        socket.on('c2s_message', async data => {
             data.message = xssFilters.inHTMLData(data.message);
 
             const sql = `INSERT INTO message(message) VALUES("${data.message}");`;
-            sqlManager.sql(
-                sql, (result) => {
-                    console.log(data.message + "を保存しました");
-                    io.emit('s2c_message', { id: result.insertId, text: data.message });
-                });
+            const result = await sqlManager.insert(sql);
 
+            if (result) {
+                console.log(data.message + 'を保存しました');
+                io.emit('s2c_message', { id: result.insertId, text: data.message });
+            }
         });
 
-        socket.on('c2s_delete_message', function (message_id) {
+        socket.on('c2s_delete_message', async message_id => {
             const sql = `DELETE FROM message WHERE id = ${message_id.id}`;
-            sqlManager.sql(
-                sql, (result) => {
-                    console.log("id:" + message_id.id + "を削除しました");
-                }
-            )
+            const result = await sqlManager.sql(sql);
+            if (result) {
+                console.log("id:" + message_id.id + "を削除しました");
+            }
         });
     });
 }
