@@ -3,9 +3,9 @@
   <v-form>
     <dl>
       <h2>ログインフォーム</h2>
-      <dt>name</dt>
+      <dt>e-mail</dt>
       <dd>
-        <input type="text" name="username" v-model="user.username" />
+        <input type="text" name="email" v-model="user.email" />
       </dd>
       <dt>password</dt>
       <dd>
@@ -15,7 +15,7 @@
     <v-btn type="submit">ログイン</v-btn>
     <a @click="test">test </a>
     <ul>
-      <li>{{ user.username }}</li>
+      <li>{{ user.email }}</li>
       <li>{{ user.password }}</li>
     </ul>
   </v-form>
@@ -28,7 +28,7 @@ export default {
   data() {
     return {
       user: {
-        username: "",
+        email: "",
         password: "",
       },
     };
@@ -36,7 +36,7 @@ export default {
   methods: {
     test: async function () {
       const params = new URLSearchParams();
-      params.append("username", this.user.username);
+      params.append("email", this.user.email);
       params.append("password", this.user.password);
       console.log("params:", params);
 
