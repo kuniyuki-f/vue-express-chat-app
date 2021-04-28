@@ -8,6 +8,7 @@
       <div id="nav">
         <router-link to="/">Home</router-link> |
         <router-link to="/login">login</router-link> |
+        <router-link to="/entry">entry</router-link> |
       </div>
     </v-main>
   </v-app>

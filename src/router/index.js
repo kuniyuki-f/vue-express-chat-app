@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import room from '@/views/chat.vue';
 import login from '@/views/login.vue';
+import entry from '@/views/entry.vue';
 
 Vue.use(VueRouter)
 
@@ -13,6 +14,10 @@ const routes = [
   {
     path: '/login',
     component: login
+  },
+  {
+    path: '/entry',
+    component: entry
   },
 ]
 
