@@ -13,19 +13,30 @@ const User1 = {
     password: "fuga"
 };
 
+const Users = async () => {
+    let users = await sqlManager.sql("select * from users");
+
+    users.rows.forEach(element => {
+        console.log(element);
+    });
+    return users.rows;
+}
+
+
+
 // ローカルストラテジーによる認証
 passport.use(new LocalStrategy({
     usernameField: 'email',
     passwordField: 'password',
 }, async (email, password, done) => {
-    let sql = `SELECT * FROM users WHERE email = "${email}"`
+    let sql = `SELECT * FROM users WHERE email = "${email}"`;
     let result = await sqlManager.sql(sql);
 
     if (result) {
         if (email !== result['rows'][0]['email']) {
             // Error
             return done(null, false,);
-        } else if (password !== result['rows'][0]['password']) {
+        } else if (!bcrypt.compareSync(password, result['rows'][0]['password'])) {
             // Error
             return done(null, false,);
         } else {
@@ -34,7 +45,7 @@ passport.use(new LocalStrategy({
         }
     } else {
         console.log('SQL側でエラーが起きました');
-        return done(null, false,)
+        return done(null, false,);
     }
 }
 ));
@@ -42,6 +53,7 @@ passport.use(new LocalStrategy({
 // シリアライズ
 passport.serializeUser((user, done) => {
     console.log('Serialize ...');
+    console.log(user);
     done(null, user);
 })
 // デシリアライズ
@@ -53,19 +65,38 @@ passport.deserializeUser((user, done) => {
 router.use(passport.initialize());
 router.use(passport.session());
 
+const authMiddleware = (req, res, next) => {
+    if (req.isAuthenticated()) {
+        console.log("認証済みです");
+        next();
+    } else {
+        console.log(req.isAuthenticated());
+        console.log(req.email);
+        console.log("未認証です");
+    }
+}
+
 router.get('/', (req, res) => {
     console.log(req.user);
-    res.status(200).send({ test: "tst" })
+    res.status(200).send({ test: "tst" });
 });
 
 router.post(
     '/login',
     passport.authenticate('local', {
         session: true,
+        successRedirect: "/user",
+        failureRedirect: "/login",
     }), (req, res) => {
-        res.status(200).send({ user: req.user })
+        console.log(req.user);
+        res.status(200).send({ user: req.user });
     }
 )
+
+router.get('/user', authMiddleware, (req, res) => {
+    console.log(req.user);
+    console.log('ログイン完了！');
+});
 
 router.post('/entry', async (req, res) => {
     const name = req.body.user.name;
@@ -81,7 +112,6 @@ router.post('/entry', async (req, res) => {
     } else {
         res.status(400).send({ msg: "登録失敗" },)
     }
-}
-)
+})
 
 module.exports = router;

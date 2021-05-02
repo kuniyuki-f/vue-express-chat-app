@@ -1,14 +1,16 @@
 const mysql = require('mysql2/promise');
-const promise = require('promise');
+
+
+exports.db_setting = {
+    host: "localhost",
+    user: 'root',
+    password: '',
+    database: "express_db"
+}
 
 exports.sql_manager = class {
-    constructor(db_name) {
-        this.db_setting = {
-            host: "localhost",
-            user: 'root',
-            password: '',
-            database: db_name
-        }
+    constructor() {
+        this.db_setting = this.db_setting
     }
     async sql(sql,) {
         try {
@@ -34,3 +36,4 @@ exports.sql_manager = class {
     }
 
 }
+
