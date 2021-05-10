@@ -1,6 +1,6 @@
 <template>
   <!-- <form action="/login" method="POST"> -->
-  <v-form>
+  <v-form @submit.prevent>
     <dl>
       <h2>ログインフォーム</h2>
       <dt>e-mail</dt>
@@ -12,17 +12,13 @@
         <input type="password" name="password" v-model="user.password" />
       </dd>
     </dl>
-    <v-btn type="submit">ログイン</v-btn>
-    <a @click="test">test </a>
-    <ul>
-      <li>{{ user.email }}</li>
-      <li>{{ user.password }}</li>
-    </ul>
+    <v-btn @click="login">ログイン</v-btn>
+    <v-btn @click="confirmation">確認</v-btn>
+    <v-btn @click="logout">ログアウト</v-btn>
   </v-form>
 </template>
 
 <script>
-import axios from "axios";
 export default {
   name: "login-form",
   data() {
@@ -34,13 +30,13 @@ export default {
     };
   },
   methods: {
-    test: async function () {
+    login: function () {
       const params = new URLSearchParams();
       params.append("email", this.user.email);
       params.append("password", this.user.password);
       console.log("params:", params);
 
-      const response = await axios
+      this.axios
         .post("http://localhost:3000/login", params)
         .then((res) => {
           console.log(res);
@@ -48,7 +44,16 @@ export default {
         .catch((err) => {
           console.log("error:", err.response);
         });
-      response;
+    },
+    confirmation: function () {
+      this.axios.get("http://localhost:3000").then((res) => {
+        console.log(res);
+      });
+    },
+    logout: function () {
+      this.axios.get("http://localhost:3000/logout").then((res) => {
+        console.log(res);
+      });
     },
   },
 };

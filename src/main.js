@@ -10,6 +10,8 @@ import VueAxios from 'vue-axios';
 Vue.config.productionTip = false;
 Vue.use(VueAxios, axios);
 
+axios.defaults.withCredentials = true;
+
 new Vue({
   vuetify,
   router,

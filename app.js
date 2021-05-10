@@ -4,24 +4,36 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const app = express();
 
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
-app.use(cookieParser());
-app.use(session({
-    key: 'express.sid',
-    secret: 'keyboard cat',
-    store: new MySQLStore("express_db", "root", ""),
-    resave: false,
-    saveUninitialized: true,
-}));
-
 // setting cors policy 
 const cors = require('cors');
 app.use(cors({
     origin: 'http://localhost:8080',
     credentials: true,
+    exposedHeaders: ['set-cookie'],
     optionsSuccessStatus: 200
 }));
+
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+app.use(cookieParser());
+const MySQLStore = require('express-mysql-session')(session);
+const sessionStore = new MySQLStore({
+    host: 'localhost',
+    port: 3306,
+    user: 'root',
+    password: '',
+    database: 'express_db'
+});
+
+app.use(session({
+    key: 'express.sid',
+    secret: 'keyboard cat',
+    resave: false,
+    store: sessionStore,
+    saveUninitialized: true,
+}));
+
+
 
 // setting routes
 app.use('/', require('./routes'));

@@ -1,18 +1,41 @@
-const express = require('express');
-const router = express.Router();
-
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
-const sql_manager = require('../public/js/sql_manager');
-const sqlManager = new sql_manager.sql_manager('express_db');
-
 const bcrypt = require('bcrypt');
 
+const express = require('express');
+const session = require('express-session');
+const router = express.Router();
+router.use(express.json());
+router.use(express.urlencoded({ extended: true }));
+
+router.use(session({
+    key: 'express.sid',
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: true,
+}));
+
+
+const passport = require('passport');
+router.use(passport.initialize());
+router.use(passport.session());
+
+// シリアライズ
+passport.serializeUser((email, done) => {
+    console.log('Serialize ...');
+    console.log(email);
+    done(null, email);
+})
+// デシリアライズ
+passport.deserializeUser((email, done) => {
+    console.log('Deserialize ...');
+    done(null, { name: email });
+})
 const User1 = {
     name: "hoge",
     password: "fuga"
 };
 
+const sql_manager = require('../public/js/sql_manager');
+const sqlManager = new sql_manager.sql_manager('express_db');
 const Users = async () => {
     let users = await sqlManager.sql("select * from users");
 
@@ -22,76 +45,87 @@ const Users = async () => {
     return users.rows;
 }
 
-
+const LocalStrategy = require('passport-local').Strategy;
 
 // ローカルストラテジーによる認証
 passport.use(new LocalStrategy({
     usernameField: 'email',
     passwordField: 'password',
-}, async (email, password, done) => {
-    let sql = `SELECT * FROM users WHERE email = "${email}"`;
-    let result = await sqlManager.sql(sql);
-
-    if (result) {
-        if (email !== result['rows'][0]['email']) {
-            // Error
-            return done(null, false,);
-        } else if (!bcrypt.compareSync(password, result['rows'][0]['password'])) {
-            // Error
-            return done(null, false,);
-        } else {
-            // Success and return user information.
-            return done(null, email);
-        }
+}, async function (email, password, done) {
+    // let sql = `SELECT * FROM users WHERE email = "${email}"`;
+    // let result = await sqlManager.sql(sql);
+    if (User1.name === email && User1.password) {
+        console.log("認証成功")
+        return done(null, email);
     } else {
-        console.log('SQL側でエラーが起きました');
-        return done(null, false,);
+        console.log('認証失敗');
+        return done(null, false);
     }
+    // if (result) {
+    //     if (email !== result['rows'][0]['email']) {
+    //         // Error
+    //         return done(null, false,);
+    //     } else if (!bcrypt.compareSync(password, result['rows'][0]['password'])) {
+    //         // Error
+    //         return done(null, false,);
+    //     } else {
+    //         // Success and return user information.
+    //         return done(null, email);
+    //     }
+    // } else {
+    //     console.log('SQL側でエラーが起きました');
+    //     return done(null, false,);
+    // }
 }
 ));
 
-// シリアライズ
-passport.serializeUser((user, done) => {
-    console.log('Serialize ...');
-    console.log(user);
-    done(null, user);
-})
-// デシリアライズ
-passport.deserializeUser((user, done) => {
-    console.log('Deserialize ...');
-    done(null, user);
-})
 
-router.use(passport.initialize());
-router.use(passport.session());
 
-const authMiddleware = (req, res, next) => {
+const authMiddleware = function (req, res, next) {
     if (req.isAuthenticated()) {
         console.log("認証済みです");
-        next();
+        return next();
     } else {
         console.log(req.isAuthenticated());
         console.log(req.email);
         console.log("未認証です");
+        res.redirect('/login');
     }
 }
 
-router.get('/', (req, res) => {
-    console.log(req.user);
-    res.status(200).send({ test: "tst" });
-});
+
+
+router.get('/', authMiddleware,
+    function (req, res) {
+        if (req.user) {
+
+            console.log('ログイン状態が保持できていますね：', req.user, req.cookies);
+            res.status(200).send({ user: req.user, cookies: req.cookies });
+        } else {
+            console.log('セッションがありません')
+        }
+    });
 
 router.post(
     '/login',
     passport.authenticate('local', {
-        session: true,
-        successRedirect: "/user",
-        failureRedirect: "/login",
-    }), (req, res) => {
+        failureRedirect: '/login'
+    }), function (req, res) {
         console.log(req.user);
-        res.status(200).send({ user: req.user });
+        res.redirect('/');
+        // res.status(200).send(req.user);
     }
 )
+
+router.get('/login', (req, res) => {
+    res.status(403).send('ログイン失敗');
+})
+
+router.get('/logout', (req, res) => {
+    req.logout();
+    res.redirect('/');
+});
+
 
 router.get('/user', authMiddleware, (req, res) => {
     console.log(req.user);
