@@ -12,9 +12,7 @@
         <input type="password" name="password" v-model="user.password" />
       </dd>
     </dl>
-    <v-btn @click="login">ログイン</v-btn>
-    <v-btn @click="confirmation">確認</v-btn>
-    <v-btn @click="logout">ログアウト</v-btn>
+    <v-btn :color="'success'" @click="login">ログイン</v-btn>
   </v-form>
 </template>
 
@@ -49,16 +47,6 @@ export default {
       if (this.isAuthenticated) {
         this.$router.push("/");
       }
-    },
-    confirmation: function () {
-      this.axios.get("http://localhost:3000").then((res) => {
-        console.log(res);
-      });
-    },
-    logout: function () {
-      this.axios.get("http://localhost:3000/logout").then((res) => {
-        console.log(res);
-      });
     },
   },
   beforeRouteEnter(to, from, next) {

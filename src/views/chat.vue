@@ -4,7 +4,7 @@
     <chatForm :socket="socket" />
     <chatMessages :socket="socket" />
     <chatLogs :socket="socket" />
-    <v-btn @click="logout">ログアウト</v-btn>
+    <logoutBtn />
     {{ isAuthenticated }}
   </v-app>
 </template>
@@ -14,6 +14,7 @@ import io from "socket.io-client";
 import chatForm from "@/components/chatForm";
 import chatLogs from "@/components/chatLogs";
 import chatMessages from "@/components/chatMessages";
+import logoutBtn from "@/components/logoutBtn";
 
 export default {
   name: "room",
@@ -24,16 +25,8 @@ export default {
       socket: io("localhost:3000"),
     };
   },
-  components: { chatForm, chatLogs, chatMessages },
-  methods: {
-    logout: function () {
-      this.axios.get("http://localhost:3000/logout").then((res) => {
-        console.log(res.data);
-        this.$store.commit("setUserName", "ゲスト");
-      });
-      this.$router.push("/");
-    },
-  },
+  components: { chatForm, chatLogs, chatMessages, logoutBtn },
+  methods: {},
   beforeRouteEnter(to, from, next) {
     next((vm) => {
       vm.checkLoggedIn();
