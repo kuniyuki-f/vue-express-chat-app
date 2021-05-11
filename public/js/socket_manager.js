@@ -3,6 +3,7 @@ const xssFilters = require('xss-filters');
 const sql_manager = require('./sql_manager');
 const sqlManager = new sql_manager.sql_manager('express_db');
 
+
 exports.socket_manager = function (server) {
     const io = require('socket.io')(server, {
         cors: {
@@ -15,10 +16,13 @@ exports.socket_manager = function (server) {
         console.log("ユーザが接続しました");
 
         const sql = `SELECT * FROM message;`;
+
         const result = await sqlManager.sql(sql);
+
         if (result) {
             io.emit('s2c_log', result['rows']);
         }
+
 
 
         socket.on('c2s_message', async data => {

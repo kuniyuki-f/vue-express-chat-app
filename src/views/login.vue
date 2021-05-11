@@ -30,20 +30,25 @@ export default {
     };
   },
   methods: {
-    login: function () {
+    login: async function () {
       const params = new URLSearchParams();
       params.append("email", this.user.email);
       params.append("password", this.user.password);
       console.log("params:", params);
 
-      this.axios
+      await this.axios
         .post("http://localhost:3000/login", params)
         .then((res) => {
-          console.log(res);
+          this.$store.commit("setUserName", res.data.user.name);
         })
         .catch((err) => {
           console.log("error:", err.response);
         });
+      await this.checkLoggedIn();
+
+      if (this.isAuthenticated) {
+        this.$router.push("/");
+      }
     },
     confirmation: function () {
       this.axios.get("http://localhost:3000").then((res) => {
@@ -55,6 +60,16 @@ export default {
         console.log(res);
       });
     },
+  },
+  beforeRouteEnter(to, from, next) {
+    next((vm) => {
+      vm.checkLoggedIn();
+      if (vm.isAuthenticated) {
+        vm.$router.push("/");
+      } else {
+        next();
+      }
+    });
   },
 };
 </script>

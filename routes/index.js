@@ -79,59 +79,57 @@ passport.use(new LocalStrategy({
 }
 ));
 
-
-
-const authMiddleware = function (req, res, next) {
+const isAuthenticated = (req, res, next) => {
     if (req.isAuthenticated()) {
         console.log("認証済みです");
         return next();
     } else {
-        console.log(req.isAuthenticated());
-        console.log(req.email);
         console.log("未認証です");
-        res.redirect('/login');
     }
 }
 
-
-
-router.get('/', authMiddleware,
-    function (req, res) {
-        if (req.user) {
-
-            console.log('ログイン状態が保持できていますね：', req.user, req.cookies);
-            res.status(200).send({ user: req.user, cookies: req.cookies });
-        } else {
-            console.log('セッションがありません')
-        }
-    });
-
-router.post(
-    '/login',
-    passport.authenticate('local', {
-        failureRedirect: '/login'
-    }), function (req, res) {
-        console.log(req.user);
-        res.redirect('/');
-        // res.status(200).send(req.user);
+router.get('/', isAuthenticated, (req, res) => {
+    if (req.user) {
+        console.log('ログイン状態が保持できていますね：', req.user, req.cookies);
+        res.status(200).send({ user: req.user, });
+    } else {
+        res.status(403).send("ユーザーがいません");
     }
-)
+});
 
-router.get('/login', (req, res) => {
-    res.status(403).send('ログイン失敗');
+// ログイン処理
+router.post('/login', passport.authenticate('local', {
+    failureRedirect: '/loginFailure',
+    successRedirect: '/loginSuccess',
+}));
+
+// ログイン成功処理
+router.get('/loginSuccess', (req, res) => {
+    console.log('user logged in: ' + req.user);
+    res.status(200).send({ user: req.user });
+});
+
+// ログイン失敗処理
+router.get('/loginFailure', (req, res) => {
+    res.status(401).send('ログインに失敗しました');
 })
 
+// ログアウト処理
 router.get('/logout', (req, res) => {
     req.logout();
-    res.redirect('/');
+    res.status(200).send('ログアウトに成功しました');
 });
 
-
-router.get('/user', authMiddleware, (req, res) => {
-    console.log(req.user);
-    console.log('ログイン完了！');
+// フロント側からログインしているか確認する
+router.get('/checkLoggedIn', (req, res) => {
+    if (req.isAuthenticated()) {
+        res.status(200).send({ isLoggedIn: true });
+    } else {
+        res.status(200).send({ isLoggedIn: false });
+    }
 });
 
+// ユーザー登録処理
 router.post('/entry', async (req, res) => {
     const name = req.body.user.name;
     const email = req.body.user.email;

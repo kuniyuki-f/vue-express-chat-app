@@ -1,23 +1,28 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import room from '@/views/chat.vue';
-import login from '@/views/login.vue';
-import entry from '@/views/entry.vue';
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    component: room
+    name: 'home',
+    component: () => import('@/views/home.vue')
+  },
+  {
+    path: '/chat',
+    name: 'chat',
+    component: () => import('@/views/chat.vue')
   },
   {
     path: '/login',
-    component: login
+    name: 'login',
+    component: () => import('@/views/login.vue')
   },
   {
     path: '/entry',
-    component: entry
+    name: 'entry',
+    component: () => import('@/views/entry.vue')
   },
 ]
 

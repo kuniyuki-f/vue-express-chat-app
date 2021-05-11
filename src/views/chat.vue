@@ -4,6 +4,8 @@
     <chatForm :socket="socket" />
     <chatMessages :socket="socket" />
     <chatLogs :socket="socket" />
+    <v-btn @click="logout">ログアウト</v-btn>
+    {{ isAuthenticated }}
   </v-app>
 </template>
 
@@ -23,6 +25,25 @@ export default {
     };
   },
   components: { chatForm, chatLogs, chatMessages },
+  methods: {
+    logout: function () {
+      this.axios.get("http://localhost:3000/logout").then((res) => {
+        console.log(res.data);
+        this.$store.commit("setUserName", "ゲスト");
+      });
+      this.$router.push("/");
+    },
+  },
+  beforeRouteEnter(to, from, next) {
+    next((vm) => {
+      vm.checkLoggedIn();
+      if (vm.isAuthenticated) {
+        next();
+      } else {
+        vm.$router.push("/login");
+      }
+    });
+  },
 };
 </script>
 

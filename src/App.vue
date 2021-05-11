@@ -1,18 +1,25 @@
 <template>
   <v-app>
-    <v-app-bar class="header" app color="primary" dark>
-      <h1>socket.io チャットアプリ</h1>
-    </v-app-bar>
+    <myHeader />
     <v-main>
       <router-view />
       <div id="nav">
         <router-link to="/">Home</router-link> |
         <router-link to="/login">login</router-link> |
-        <router-link to="/entry">entry</router-link>
+        <router-link to="/entry">entry</router-link> |
+        <router-link to="/chat">chat</router-link> |
       </div>
     </v-main>
   </v-app>
 </template>
+
+<script>
+import myHeader from "@/components/header";
+export default {
+  name: "app",
+  components: { myHeader },
+};
+</script>
 
 <style lang="scss">
 #nav {

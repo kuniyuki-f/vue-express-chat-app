@@ -28,12 +28,11 @@ const sessionStore = new MySQLStore({
 app.use(session({
     key: 'express.sid',
     secret: 'keyboard cat',
+    cookie: { maxAge: 60 },
     resave: false,
     store: sessionStore,
     saveUninitialized: true,
 }));
-
-
 
 // setting routes
 app.use('/', require('./routes'));
