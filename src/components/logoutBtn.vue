@@ -14,6 +14,7 @@ export default {
         .then((res) => {
           console.log(res.data);
           this.$store.commit("setUserName", "ゲスト");
+          this.$store.commit("setIsAuthenticated", false);
           this.$router.push("/");
         })
         .catch((err) => {
