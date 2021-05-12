@@ -85,7 +85,10 @@ export default {
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
-      vm.checkLoggedIn();
+      if (!vm.isAuthenticated) {
+        vm.checkLoggedIn();
+      }
+
       if (vm.isAuthenticated) {
         vm.$router.push("/");
       } else {

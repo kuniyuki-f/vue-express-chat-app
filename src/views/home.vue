@@ -21,7 +21,9 @@ export default {
   name: "home",
   beforeRouteEnter(to, from, next) {
     next((vm) => {
-      vm.checkLoggedIn();
+      if (!vm.isAuthenticated) {
+        vm.checkLoggedIn();
+      }
       next();
     });
   },

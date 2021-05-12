@@ -27,8 +27,11 @@ export default {
   components: { chatForm, chatLogs, chatMessages, logoutBtn },
   methods: {},
   beforeRouteEnter(to, from, next) {
-    next((vm) => {
-      vm.checkLoggedIn();
+    next(async (vm) => {
+      if (!vm.isAuthenticated) {
+        await vm.checkLoggedIn();
+      }
+
       if (vm.isAuthenticated) {
         next();
       } else {
