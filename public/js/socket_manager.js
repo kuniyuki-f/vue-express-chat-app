@@ -27,8 +27,9 @@ exports.socket_manager = function (server) {
 
         socket.on('c2s_message', async data => {
             data.message = xssFilters.inHTMLData(data.message);
+            const date = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-            const sql = `INSERT INTO message(message) VALUES("${data.message}");`;
+            const sql = `INSERT INTO message(message, createdAt, updatedAt) VALUES("${data.message}", "${date}", "${date}");`;
             const result = await sqlManager.insert(sql);
 
             if (result) {
