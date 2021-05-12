@@ -19,9 +19,6 @@
 <script>
 export default {
   name: "home",
-  mounted() {
-    this.checkLoggedIn();
-  },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
       vm.checkLoggedIn();

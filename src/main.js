@@ -6,10 +6,13 @@ import router from './router';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
 
+
 import gv from './mixins/globalValiables';
 
 Vue.config.productionTip = false;
 Vue.use(VueAxios, axios);
+
+
 Vue.mixin(gv);
 
 axios.defaults.withCredentials = true;

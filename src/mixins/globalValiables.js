@@ -12,9 +12,10 @@ export default {
             await this.axios
                 .get(this.serverPath + '/checkLoggedIn')
                 .then((res) => {
-                    console.log(res.data.isLoggedIn)
                     if (res.data.isLoggedIn) {
                         this.$store.commit('setIsAuthenticated', true);
+                        this.$store.commit('setUserName', res.data.user);
+
                     } else {
                         this.$store.commit('setIsAuthenticated', false);
                     }

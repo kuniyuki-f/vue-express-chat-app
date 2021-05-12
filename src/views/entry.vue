@@ -1,30 +1,72 @@
 <template>
-  <div>
+  <validation-observer ref="observer" v-slot="{ invalid }">
     <v-form>
       <dl>
         <h2>エントリーフォーム</h2>
-        <dt>name</dt>
-        <dd>
-          <input type="text" name="name" v-model="user.name" />
-        </dd>
-        <dt>email</dt>
-        <dd>
-          <input type="email" name="email" v-model="user.email" />
-        </dd>
-        <dt>password</dt>
-        <dd>
-          <input type="password" name="password" v-model="user.password" />
-        </dd>
-        <v-btn @click="entry" @submit.prevent></v-btn>
-        {{ user.password }} <br />
+        <validation-provider
+          rules="required"
+          name="ニックネーム"
+          v-slot="{ errors }"
+        >
+          <v-text-field
+            v-model="user.name"
+            label="ニックネーム"
+            :error-messages="errors"
+            required
+          >
+          </v-text-field>
+        </validation-provider>
+
+        <validation-provider
+          rules="required|email"
+          name="メールアドレス"
+          v-slot="{ errors }"
+        >
+          <v-text-field
+            v-model="user.email"
+            label="E-mail"
+            :error-messages="errors"
+            required
+          ></v-text-field>
+        </validation-provider>
+
+        <validation-provider
+          rules="required"
+          name="パスワード"
+          v-slot="{ errors }"
+        >
+          <v-text-field
+            v-model="user.password"
+            label="パスワード"
+            :type="'password'"
+            :error-messages="errors"
+            required
+          ></v-text-field>
+        </validation-provider>
+        <v-btn :color="'success'" @click="entry" :disabled="invalid"
+          >登録する</v-btn
+        >
+        <br />
       </dl>
     </v-form>
-  </div>
+  </validation-observer>
 </template>
 
 <script>
 import bcrypt from "bcryptjs";
-import axios from "axios";
+
+import { required, email } from "vee-validate/dist/rules";
+import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
+
+extend("required", {
+  ...required,
+  message: "{_field_}は必須です",
+});
+
+extend("email", {
+  ...email,
+  message: "メールアドレスの形式で入力してください",
+});
 
 export default {
   name: "entryForm",
@@ -37,10 +79,11 @@ export default {
       },
     };
   },
+  components: { ValidationObserver, ValidationProvider },
   methods: {
     entry: function () {
       this.user.password = bcrypt.hashSync(this.user.password, 10);
-      axios
+      this.axios
         .post("http://localhost:3000/entry", {
           user: this.user,
         })

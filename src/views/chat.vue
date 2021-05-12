@@ -5,7 +5,6 @@
     <chatMessages :socket="socket" />
     <chatLogs :socket="socket" />
     <logoutBtn />
-    {{ isAuthenticated }}
   </v-app>
 </template>
 

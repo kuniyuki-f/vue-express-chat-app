@@ -1,22 +1,56 @@
 <template>
   <!-- <form action="/login" method="POST"> -->
-  <v-form @submit.prevent>
-    <dl>
+  <validation-observer ref="observer" v-slot="{ invalid }">
+    <v-form @submit.prevent>
       <h2>ログインフォーム</h2>
-      <dt>e-mail</dt>
-      <dd>
-        <input type="text" name="email" v-model="user.email" />
-      </dd>
-      <dt>password</dt>
-      <dd>
-        <input type="password" name="password" v-model="user.password" />
-      </dd>
-    </dl>
-    <v-btn :color="'success'" @click="login">ログイン</v-btn>
-  </v-form>
+
+      <validation-provider
+        rules="required|email"
+        name="メールアドレス"
+        v-slot="{ errors }"
+      >
+        <v-text-field
+          v-model="user.email"
+          label="E-mail"
+          :error-messages="errors"
+          required
+        ></v-text-field>
+      </validation-provider>
+      <validation-provider
+        rules="required"
+        name="パスワード"
+        v-slot="{ errors }"
+      >
+        <v-text-field
+          v-model="user.password"
+          label="パスワード"
+          :type="'password'"
+          :error-messages="errors"
+          required
+        ></v-text-field>
+      </validation-provider>
+
+      <v-btn :color="'success'" @click="login" :disabled="invalid"
+        >ログイン</v-btn
+      >
+    </v-form>
+  </validation-observer>
 </template>
 
 <script>
+import { required, email } from "vee-validate/dist/rules";
+import { extend, ValidationObserver, ValidationProvider } from "vee-validate";
+
+extend("required", {
+  ...required,
+  message: "{_field_}は必須です",
+});
+
+extend("email", {
+  ...email,
+  message: "メールアドレスの形式で入力してください",
+});
+
 export default {
   name: "login-form",
   data() {
@@ -27,17 +61,17 @@ export default {
       },
     };
   },
+  components: { ValidationObserver, ValidationProvider },
   methods: {
     login: async function () {
       const params = new URLSearchParams();
       params.append("email", this.user.email);
       params.append("password", this.user.password);
-      console.log("params:", params);
 
       await this.axios
         .post("http://localhost:3000/login", params)
         .then((res) => {
-          this.$store.commit("setUserName", res.data.user.name);
+          this.$store.commit("setUserName", res.data.user);
         })
         .catch((err) => {
           console.log("error:", err.response);
