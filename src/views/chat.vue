@@ -21,7 +21,7 @@ export default {
     return {
       messages: [],
       logs: [],
-      socket: io("localhost:3000"),
+      socket: io("localhost:3000", { withCredentials: true }),
     };
   },
   components: { chatForm, chatLogs, chatMessages, logoutBtn },

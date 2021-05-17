@@ -94,11 +94,13 @@ router.get('/', isAuthenticated, async (req, res) => {
 router.post('/login', passport.authenticate('local', {
     failureRedirect: '/loginFailure',
     successRedirect: '/loginSuccess',
+    session: true,
 }));
 
 // ログイン成功処理
 router.get('/loginSuccess', async (req, res) => {
     console.log('user logged in: ' + req.user);
+
     const sql = `SELECT * FROM users WHERE email = "${req.user}";`;
     const result = await sqlManager.sql(sql);
     if (result) {
@@ -152,4 +154,4 @@ router.post('/entry', async (req, res) => {
     }
 })
 
-module.exports = router;
+module.exports = { router, passport };
