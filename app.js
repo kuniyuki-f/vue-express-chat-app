@@ -7,7 +7,6 @@ const app = express();
 // setting cors policy 
 const cors = require('cors');
 app.use(cors({
-    // origin: 'http://localhost:8080',
     origin: true,
     credentials: true,
     exposedHeaders: ['set-cookie'],
@@ -26,11 +25,9 @@ const sessionStore = new MySQLStore({
     database: 'express_db'
 });
 
-
 const sessionOption = {
     key: 'express.sid',
     secret: 'keyboard cat',
-    // cookie: { maxAge: 60 },
     resave: false,
     store: sessionStore,
     saveUninitialized: true,
@@ -51,17 +48,5 @@ const server = app.listen(3000, () => {
 
 // socket.io
 const socket_manager = require('./public/js/socket_manager.js');
-const socketManager = new socket_manager.socket_manager(server, sessionMiddleware, routes.passport, sessionStore);
-
-const wrap = middleware => (socket, next) => middleware(socket.request, socket.request.res, next);
-socketManager.io.use(wrap(sessionMiddleware));
-// socketManager.io.use(wrap(routes.passport));
-// socketManager.io.use(wrap(routes.passport.initialize()));
-// socketManager.io.use(wrap(routes.passport.session()));
-// const sharedSession = require('express-socket.io-session');
-// socketManager.io.use(sharedSession(app.session, cookieParser({
-//     passport: 'passport'
-// })));
-
+const socketManager = new socket_manager.socket_manager(server, sessionMiddleware,);
 socketManager.startSocket();
-
