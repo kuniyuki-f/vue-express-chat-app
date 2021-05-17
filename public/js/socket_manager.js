@@ -2,8 +2,6 @@
 const xssFilters = require('xss-filters');
 const sql_manager = require('./sql_manager');
 const sqlManager = new sql_manager.sql_manager('express_db');
-const cookieParser = require('cookie-parser')
-const passportSocketio = require('passport.socketio');
 
 exports.socket_manager = class {
     constructor(server, sessionMiddleware,) {
