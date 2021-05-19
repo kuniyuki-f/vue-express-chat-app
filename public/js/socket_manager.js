@@ -16,29 +16,42 @@ exports.socket_manager = class {
         const wrap = middleware => (socket, next) => middleware(socket.request, {}, next);
         this.io.use(wrap(sessionMiddleware));
     }
+    getMessageList = async function () {
+        const sql = `SELECT * FROM message;`;
+        const result = await sqlManager.sql(sql);
+
+        if (result) {
+            this.io.emit('getMessageList', result['rows']);
+            this.io.emit('s2c_log', result['rows']);
+        }
+    }
     startSocket = function () {
         this.io.on('connection', async socket => {
             console.log("socket.io: ユーザが接続しました");
-            console.log(socket.request.session)
+            console.log(socket.request.session);
 
-            const sql = `SELECT * FROM message;`;
+            let userEmail = socket.request.session.passport.user;
 
-            const result = await sqlManager.sql(sql);
+            // const sql = `SELECT * FROM message;`;
+            // const result = await sqlManager.sql(sql);
 
-            if (result) {
-                this.io.emit('s2c_log', result['rows']);
-            }
+            // if (result) {
+            //     this.io.emit('s2c_log', result['rows']);
+            // }
+
+            this.getMessageList();
 
             socket.on('c2s_message', async data => {
                 data.message = xssFilters.inHTMLData(data.message);
                 const date = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
-                const sql = `INSERT INTO message(message, createdAt, updatedAt) VALUES("${data.message}", "${date}", "${date}");`;
+                const sql = `INSERT INTO message(message, createdAt, updatedAt, email) VALUES("${data.message}", "${date}", "${date}", "${userEmail}");`;
                 const result = await sqlManager.insert(sql);
 
                 if (result) {
                     console.log(data.message + 'を保存しました');
                     this.io.emit('s2c_message', { id: result.insertId, text: data.message });
+                    this.getMessageList();
                 }
             });
 
@@ -47,6 +60,7 @@ exports.socket_manager = class {
                 const result = await sqlManager.sql(sql);
                 if (result) {
                     console.log("id:" + message_id.id + "を削除しました");
+                    this.getMessageList();
                 }
             });
         });

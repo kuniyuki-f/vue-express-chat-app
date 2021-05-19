@@ -7,6 +7,7 @@ Vue.use(Vuex);
 const initialState = {
     messages: [],
     logs: [],
+    messageList: [],
     user: { name: 'ゲスト' },
     isAuthenticated: false,
 }
@@ -20,6 +21,9 @@ export default new Vuex.Store({
         },
         setLogs(state, logs) {
             state.logs = logs;
+        },
+        setMessageList(state, messageList) {
+            state.messageList = messageList;
         },
         // authentication
         setUserName(state, name) {
