@@ -1,5 +1,10 @@
 <template>
-  <v-btn @click="deleteMessage(msg)" color="error">delete</v-btn>
+  <v-btn
+    v-if="msg.email === user.email"
+    @click="deleteMessage(msg)"
+    color="error"
+    >delete
+  </v-btn>
 </template>
 
 <script>
@@ -13,7 +18,7 @@ export default {
     deleteMessage(msg) {
       const id = msg.id;
 
-      this.socket.emit("c2s_delete_message", { id });
+      this.socket.emit("c2s_delete_message", msg);
 
       const messages = this.messages.filter((el) => el.id !== id);
       const logs = this.logs.filter((el) => el.id !== id);
@@ -28,6 +33,9 @@ export default {
     },
     messages: function () {
       return this.$store.state.messages;
+    },
+    user: function () {
+      return this.$store.state.user;
     },
   },
 };

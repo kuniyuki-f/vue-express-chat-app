@@ -4,6 +4,8 @@
       type="text"
       @keyup.enter="sendMessage(message)"
       v-model="message"
+      placeholder="本文を入力してください"
+      class="message"
     />
     <v-btn color="primary" primary @click="sendMessage(message)">send</v-btn>
   </form>
@@ -29,3 +31,13 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+form {
+  max-width: 50rem;
+  display: flex;
+  align-items: center;
+}
+.message {
+}
+</style>

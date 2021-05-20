@@ -104,7 +104,7 @@ router.get('/loginSuccess', async (req, res) => {
     const sql = `SELECT * FROM users WHERE email = "${req.user}";`;
     const result = await sqlManager.sql(sql);
     if (result) {
-        res.status(200).send({ user: result.rows[0].name });
+        res.status(200).send({ user: result.rows[0] });
     }
 });
 

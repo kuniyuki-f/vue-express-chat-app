@@ -1,13 +1,17 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-// import createPersistedState from "vuex-persistedstate";
+import createPersistedState from "vuex-persistedstate";
 
 Vue.use(Vuex);
 
 const initialState = {
     messages: [],
     logs: [],
-    user: { name: 'ゲスト' },
+    messageList: [],
+    user: {
+        name: 'ゲスト',
+        email: ''
+    },
     isAuthenticated: false,
 }
 
@@ -21,12 +25,21 @@ export default new Vuex.Store({
         setLogs(state, logs) {
             state.logs = logs;
         },
+        setMessageList(state, messageList) {
+            state.messageList = messageList;
+        },
         // authentication
-        setUserName(state, name) {
-            state.user.name = name;
+        setUserName(state, userName) {
+            state.user.name = userName;
+        },
+        setUserEmail(state, userEmail) {
+            state.user.email = userEmail;
         },
         setIsAuthenticated(state, isAuthenticated) {
             state.isAuthenticated = isAuthenticated;
         }
-    }
+    },
+    plugins: [createPersistedState({
+        storage: window.sessionStorage
+    })]
 });

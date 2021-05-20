@@ -71,7 +71,8 @@ export default {
       await this.axios
         .post("http://localhost:3000/login", params)
         .then((res) => {
-          this.$store.commit("setUserName", res.data.user);
+          this.$store.commit("setUserName", res.data.user.name);
+          this.$store.commit("setUserEmail", res.data.user.email);
         })
         .catch((err) => {
           console.log("error:", err.response);

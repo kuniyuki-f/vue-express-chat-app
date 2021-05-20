@@ -2,8 +2,10 @@
   <v-app>
     <h2>チャットルーム</h2>
     <chatForm :socket="socket" />
-    <chatMessages :socket="socket" />
-    <chatLogs :socket="socket" />
+    <section>
+      <h2>メッセージリスト</h2>
+      <messageList :socket="socket" />
+    </section>
     <logoutBtn />
   </v-app>
 </template>
@@ -11,8 +13,7 @@
 <script>
 import io from "socket.io-client";
 import chatForm from "@/components/chatForm";
-import chatLogs from "@/components/chatLogs";
-import chatMessages from "@/components/chatMessages";
+import messageList from "@/components/messageList";
 import logoutBtn from "@/components/logoutBtn";
 
 export default {
@@ -24,7 +25,7 @@ export default {
       socket: io("localhost:3000", { withCredentials: true }),
     };
   },
-  components: { chatForm, chatLogs, chatMessages, logoutBtn },
+  components: { chatForm, logoutBtn, messageList },
   methods: {},
   beforeRouteEnter(to, from, next) {
     next(async (vm) => {
