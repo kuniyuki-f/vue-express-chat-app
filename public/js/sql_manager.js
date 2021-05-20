@@ -15,7 +15,9 @@ exports.sql_manager = class {
             this.con = await mysql.createConnection(this.db_setting);
 
             const [rows, fields] = await this.con.execute(sql);
-            if (rows.length == 0) throw new Error('該当レコードがありません');
+            if (rows.length == 0) {
+                return null;
+            }
             return { rows: rows, fields: fields };
         } catch (e) {
             console.log(e);

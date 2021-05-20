@@ -35,6 +35,7 @@ export default {
   mounted() {
     this.socket.on("getMessageList", (data) => {
       this.$store.commit("setMessageList", data);
+      console.log(this.user);
     });
   },
   methods: {
@@ -46,6 +47,9 @@ export default {
   computed: {
     messageList: function () {
       return this.$store.state.messageList;
+    },
+    user: function () {
+      return this.$store.state.user;
     },
   },
 };
